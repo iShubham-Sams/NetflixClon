@@ -1,10 +1,10 @@
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useState } from "react";
-
-const Row = ({ title, requests }) => {
+import Movie from "./Movie";
+import {MdChevronLeft,MdChevronRight} from 'react-icons/md'
+const Row = ({ title, requests,rowId }) => {
   const [movie, setMovies] = useState([]);
+  
   useEffect(() => {
     const dataFetch = async () => {
       const res = await axios.get(requests);
@@ -13,26 +13,26 @@ const Row = ({ title, requests }) => {
     };
     dataFetch();
   }, [requests]);
+
+  const slideLeft=()=>{
+    var slider=document.getElementById('slider'+rowId)
+    slider.scrollLeft=slider.scrollLeft - 500;
+  }
+  const slideRight=()=>{
+    var slider=document.getElementById('slider'+rowId)
+    slider.scrollLeft=slider.scrollLeft +500
+  }
   return (
     <>
       <h2 className="text-white font-bold md:text-xl p-4">{title}</h2>
-      <div className="relative flex items-center">
-        <div id={"slider"}>
+      <div className="relative flex items-center group">
+      <MdChevronLeft onClick={slideLeft} className="bg-white rounded-full left-0 absolute opacity-50 hover:opacity-100 cursor-pointer z-10 hidden group-hover:block" size={40}/>
+        <div id={"slider"+rowId} className='w-full h-full overflow-x-scroll whitespace-nowrap scroll-smooth scrollbar-hide relative'>
           {movie.map((e, i) => {
-            return (
-                <div key={i} className="w-[160px] sm:w-[200px] md:w-[240px] lg:w-[280px] h-[200px] inline-block cursor-pointer relative p-2">
-              <img
-                className="w-full h-full object-cover block"
-                src={`https://image.tmdb.org/t/p/w500/${e.poster_path}`}
-                alt={e.title}
-              />
-              <div className="absolute top-0 left-0 h-full w-full opacity-0 hover:bg-black/80 hover:opacity-100 text-white">
-                <p className="white-space-normal text-xs md:text-sm font-bold flex justify-center items-center h-full text-center">{e?.title}</p>
-              </div>
-              </div>
-            );
+           return <Movie e={e} i={i}/>
           })}
         </div>
+        <MdChevronRight onClick={slideRight} className="bg-white rounded-full absolute right-0 opacity-50 hover:opacity-100 cursor-pointer z-10 hidden group-hover:block" size={40}/>
       </div>
     </>
   );
